@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { HandGestureRecognizer } from './components/HandGestureRecognizer';
 import ParticlesBackground from './components/ParticlesBackground';
 import { ThreeDView } from './components/ThreeDView';
@@ -18,7 +18,9 @@ import {
   Scan,
   Zap,
   ArrowRight,
-  Box
+  Box,
+  Video,
+  Youtube
 } from 'lucide-react';
 
 // --- Components ---
@@ -47,54 +49,20 @@ const SectionTitle = ({ title, icon }: any) => (
   </h2>
 );
 
-const TiltCard = ({ children, className = "", delay = "" }: any) => {
-  const ref = useRef<HTMLDivElement>(null);
-  const [rotate, setRotate] = useState({ x: 0, y: 0 });
-
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!ref.current) return;
-    const rect = ref.current.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-    const centerX = rect.width / 2;
-    const centerY = rect.height / 2;
-    
-    const rotateX = ((y - centerY) / centerY) * -5; // Tilt intensity
-    const rotateY = ((x - centerX) / centerX) * 5;
-
-    setRotate({ x: rotateX, y: rotateY });
-  };
-
-  const handleMouseLeave = () => {
-    setRotate({ x: 0, y: 0 });
-  };
-
-  return (
-    <div 
-      ref={ref}
-      onMouseMove={handleMouseMove}
-      onMouseLeave={handleMouseLeave}
-      className={`relative perspective-1000 ${className} ${delay} animate-enter`}
-    >
-      <div 
-        className="bg-zinc-900/50 border border-zinc-800 rounded-2xl p-6 transition-all duration-200 ease-out hover:shadow-[0_0_40px_rgba(59,130,246,0.1)] group overflow-hidden"
-        style={{
-          transform: `rotateX(${rotate.x}deg) rotateY(${rotate.y}deg)`,
-          transformStyle: 'preserve-3d'
-        }}
-      >
+const TiltCard = ({ children, className = "", delay = "" }: any) => (
+  <div className={`relative ${className} ${delay} animate-enter`}>
+    <div className="bg-zinc-900/50 border border-zinc-800 rounded-2xl p-6 transition-all duration-200 ease-out hover:shadow-[0_0_40px_rgba(59,130,246,0.1)] group overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
         <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMSIgY3k9IjEiIHI9IjEiIGZpbGw9InJnYmEoMjU1LDI1NSwyNTUsMC4wNSkiLz48L3N2Zz4=')] opacity-20 pointer-events-none" />
         
-        <div className="relative z-10" style={{ transform: 'translateZ(20px)' }}>
+      <div className="relative z-10">
           {children}
         </div>
       </div>
     </div>
   );
-};
 
-const Badge = ({ text }: { text: string }) => (
+const Badge: React.FC<{ text: string }> = ({ text }) => (
   <span className="px-3 py-1 rounded-full text-xs font-medium bg-zinc-800/50 text-zinc-300 border border-zinc-700/50 font-mono hover:border-blue-500/30 hover:text-blue-400 hover:bg-blue-500/10 transition-all cursor-default">
     {text}
   </span>
@@ -201,18 +169,50 @@ const Experience = () => (
     <div className="max-w-3xl mx-auto py-8">
       <SectionTitle title="Experience" icon={<Briefcase className="w-6 h-6" />} />
       
-      <div className="space-y-6">
-        <TiltCard delay="delay-100">
+      <div className="space-y-10">
+        <TiltCard delay="delay-50">
           <div className="flex flex-col md:flex-row md:justify-between md:items-start mb-4 gap-2">
             <div>
-              <h3 className="text-xl font-display font-bold text-white group-hover:text-blue-400 transition-colors tracking-wide">Intern</h3>
+              <h3 className="text-xl font-display font-bold text-white group-hover:text-blue-400 transition-colors tracking-wide">Student</h3>
               <p className="text-blue-400 font-medium flex items-center gap-2 font-sans">
-                Xperience Coding LLC 
+                University of Illinois Urbana-Champaign
                 <ExternalLink className="w-3 h-3 opacity-50" />
               </p>
             </div>
             <span className="px-3 py-1 rounded-md bg-zinc-900 border border-zinc-800 text-xs text-zinc-500 font-mono shadow-inner">
-              May 2024 - Present
+              Aug 2025 - Present
+            </span>
+          </div>
+          <p className="text-zinc-400 text-sm mb-6 leading-relaxed font-sans">
+            Immersed in the Grainger engineering community, focusing on circuits, embedded systems, and neurotech-inspired side projects while collaborating with peers across labs and hackathons.
+          </p>
+          <div className="flex flex-wrap gap-2">
+            <Badge text="Electrical Engineering" />
+            <Badge text="Embedded Systems" />
+            <Badge text="Signal Processing" />
+            <Badge text="Student Life" />
+          </div>
+        </TiltCard>
+
+        <div>
+          <div className="mb-4">
+            <p className="text-xs font-mono text-blue-400 tracking-[0.3em] uppercase">Leadership Roots</p>
+            <h3 className="text-2xl font-display font-bold text-white">Vernon Hills High School</h3>
+            <p className="text-sm text-zinc-500 font-sans">Where I launched the projects below.</p>
+          </div>
+
+          <div className="space-y-6">
+            <TiltCard delay="delay-150">
+              <div className="flex flex-col md:flex-row md:justify-between md:items-start mb-4 gap-2">
+                <div>
+                  <h3 className="text-xl font-display font-bold text-white group-hover:text-blue-400 transition-colors tracking-wide">Intern</h3>
+                  <p className="text-blue-400 font-medium flex items-center gap-2 font-sans">
+                    Xperience Coding LLC 
+                    <ExternalLink className="w-3 h-3 opacity-50" />
+                  </p>
+                </div>
+                <span className="px-3 py-1 rounded-md bg-zinc-900 border border-zinc-800 text-xs text-zinc-500 font-mono shadow-inner">
+                  May 2024 - May 2025
             </span>
           </div>
           <p className="text-zinc-400 text-sm mb-6 leading-relaxed font-sans">
@@ -226,7 +226,7 @@ const Experience = () => (
           </div>
         </TiltCard>
 
-        <TiltCard delay="delay-200">
+            <TiltCard delay="delay-250">
           <div className="flex flex-col md:flex-row md:justify-between md:items-start mb-4 gap-2">
             <div>
               <h3 className="text-xl font-display font-bold text-white group-hover:text-blue-400 transition-colors tracking-wide">VP of Marketing Strategy</h3>
@@ -246,6 +246,8 @@ const Experience = () => (
             <Badge text="Team Leadership" />
           </div>
         </TiltCard>
+          </div>
+        </div>
       </div>
     </div>
   </PageWrapper>
@@ -277,8 +279,8 @@ const Education = () => (
               <div className="space-y-3">
                  <h4 className="text-xs font-bold text-zinc-500 uppercase tracking-wider font-mono">Focus Areas</h4>
                  <div className="flex flex-wrap gap-2">
-                  <Badge text="Digital Signal Processing" />
-                  <Badge text="Embedded Systems" />
+                  <Badge text="Python" />
+                  <Badge text="Circuit Analysis" />
                   <Badge text="Film Production" />
                   <Badge text="iOS Development" />
                 </div>
@@ -301,54 +303,394 @@ const Education = () => (
   </PageWrapper>
 );
 
-const Contact = () => (
+const Projects = ({ setPage }: { setPage?: (p: string) => void }) => {
+  const projectData = [
+    {
+      title: 'Wave Sweeper',
+      timeline: '2025',
+      blurb: 'Autonomous trash-collecting boat using Raspberry Pi, Pi Cam v2, and OpenCV to detect floating debris and pilot an L298N-controlled drivetrain for retrieval.',
+      tags: ['Raspberry Pi', 'OpenCV', 'L298N', 'Computer Vision', 'Autonomous Robotics'],
+      links: [
+        { label: 'Watch Demo', href: 'https://drive.google.com/file/d/1o081b2v-vlBUxPpuBi9iGJxUhlbnqUsi/view?usp=sharing' }
+      ]
+    },
+    {
+      title: 'Reflectra',
+      timeline: '2024',
+      blurb: 'A modern burnout-recovery toolkit with interactive quizzes, grounding exercises, and calming soundscapes built on a custom HTML/CSS/JS stack.',
+      tags: ['HTML', 'CSS', 'JavaScript'],
+      links: [
+        { label: 'Live Site', href: 'https://abraham77967.github.io/Reflectra/index.html' },
+        { label: 'GitHub', href: 'https://github.com/abraham77967/Reflectra' }
+      ]
+    },
+    {
+      title: 'Planora',
+      timeline: '2025',
+      blurb: 'A scheduling companion for students with weather snapshots, agenda planning, and quick task tracking to keep busy semesters organized.',
+      tags: ['Productivity', 'UI/UX', 'JavaScript'],
+      links: [
+        { label: 'Live Site', href: 'https://abraham77967.github.io/planora-temp/' },
+        { label: 'GitHub', href: 'https://github.com/Abraham77967/planora-temp' }
+      ]
+    }
+  ];
+
+  const heroProject = projectData[0];
+  const otherProjects = projectData.slice(1);
+
+  return (
   <PageWrapper>
-    <div className="max-w-2xl mx-auto py-8">
-      <SectionTitle title="Get in Touch" icon={<Mail className="w-6 h-6" />} />
-      
-      <div className="grid gap-6">
-        <a href="https://linkedin.com/in/abrahamguo" target="_blank" rel="noopener noreferrer">
-          <TiltCard delay="delay-100" className="flex items-center gap-6 group cursor-pointer">
-            <div className="p-4 bg-blue-500/10 rounded-xl text-blue-400 group-hover:bg-blue-500/20 group-hover:scale-110 transition-all duration-300 shadow-[0_0_20px_rgba(59,130,246,0.1)]">
-              <Linkedin className="w-8 h-8" />
-            </div>
-            <div className="flex-1">
-              <h3 className="font-display font-bold text-zinc-100 text-lg group-hover:text-blue-400 transition-colors tracking-wide">LinkedIn</h3>
-              <p className="text-sm text-zinc-500 font-sans">Connect professionally & view recommendations.</p>
-            </div>
-            <ExternalLink className="w-5 h-5 text-zinc-700 group-hover:text-zinc-400 transition-colors" />
-          </TiltCard>
-        </a>
+      <div className="max-w-4xl mx-auto py-8">
+        <SectionTitle title="Projects" icon={<Code2 className="w-6 h-6" />} />
 
-        <a href="https://github.com/abrahamguo" target="_blank" rel="noopener noreferrer">
-          <TiltCard delay="delay-200" className="flex items-center gap-6 group cursor-pointer">
-            <div className="p-4 bg-purple-500/10 rounded-xl text-purple-400 group-hover:bg-purple-500/20 group-hover:scale-110 transition-all duration-300 shadow-[0_0_20px_rgba(168,85,247,0.1)]">
-              <Github className="w-8 h-8" />
+        <div className="space-y-8">
+          <TiltCard delay="delay-50">
+            <div className="flex flex-col gap-4">
+              <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
+                <div>
+                  <p className="text-xs font-mono text-blue-400 uppercase tracking-[0.4em]">Flagship</p>
+                  <h3 className="text-3xl font-display font-bold text-white">{heroProject.title}</h3>
+                </div>
+                <span className="px-3 py-1 text-xs font-mono text-blue-200 bg-blue-950/40 rounded-full border border-blue-500/40">{heroProject.timeline}</span>
+              </div>
+              <p className="text-sm text-zinc-200">{heroProject.blurb}</p>
+              <div className="flex flex-wrap gap-2">
+                {heroProject.tags.map((tag) => (
+                  <Badge key={tag} text={tag} />
+                ))}
+              </div>
+              <div className="flex flex-wrap gap-3 pt-2">
+                {heroProject.links.map((link) => (
+                  <a
+                    key={link.href}
+                    href={link.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-white/30 text-sm font-semibold uppercase tracking-wider text-white hover:border-white hover:bg-white/10 transition-colors"
+                  >
+                    {link.label}
+                    <ExternalLink className="w-4 h-4" />
+                  </a>
+                ))}
+                <button
+                  onClick={() => setPage && setPage('test')}
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-white/30 text-sm font-semibold uppercase tracking-wider text-white hover:border-white hover:bg-white/10 transition-colors"
+                >
+                  Prototype 3D Model
+                  <Box className="w-4 h-4" />
+                </button>
+              </div>
             </div>
-            <div className="flex-1">
-              <h3 className="font-display font-bold text-zinc-100 text-lg group-hover:text-purple-400 transition-colors tracking-wide">GitHub</h3>
-              <p className="text-sm text-zinc-500 font-sans">Check out my open-source contributions.</p>
-            </div>
-            <ExternalLink className="w-5 h-5 text-zinc-700 group-hover:text-zinc-400 transition-colors" />
           </TiltCard>
-        </a>
 
-        <a href="mailto:contact@abrahamguo.com">
-          <TiltCard delay="delay-300" className="flex items-center gap-6 group cursor-pointer">
-            <div className="p-4 bg-blue-500/10 rounded-xl text-blue-400 group-hover:bg-blue-500/20 group-hover:scale-110 transition-all duration-300 shadow-[0_0_20px_rgba(59,130,246,0.1)]">
-              <Mail className="w-8 h-8" />
+          {otherProjects.map((project, idx) => (
+            <TiltCard key={project.title} delay={`delay-${150 + idx * 100}`}>
+              <div className="flex flex-col gap-4">
+                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
+                  <div>
+                    <p className="text-xs font-mono text-blue-400 uppercase tracking-[0.4em]">Project</p>
+                    <h3 className="text-3xl font-display font-bold text-white">{project.title}</h3>
+                  </div>
+                  <span className="px-3 py-1 text-xs font-mono text-zinc-500 bg-zinc-900 rounded-full border border-zinc-800">{project.timeline}</span>
+                </div>
+                <p className="text-sm text-zinc-400">{project.blurb}</p>
+                <div className="flex flex-wrap gap-2">
+                  {project.tags.map((tag) => (
+                    <Badge key={tag} text={tag} />
+                  ))}
+                </div>
+                <div className="flex flex-wrap gap-3 pt-2">
+                  {project.links.map((link) => (
+                    <a
+                      key={link.href}
+                      href={link.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-zinc-800 text-sm font-semibold uppercase tracking-wider text-zinc-200 hover:border-blue-500/50 hover:text-blue-400 transition-colors"
+                    >
+                      {link.label}
+                      <ExternalLink className="w-4 h-4" />
+                    </a>
+                  ))}
+                </div>
+              </div>
+            </TiltCard>
+          ))}
+        </div>
+      </div>
+    </PageWrapper>
+  );
+};
+
+const Skills = () => {
+  const videoServices = ['Commercials', 'Short Films', 'Promo Videos'];
+  const toolBadges = ['DaVinci Resolve', 'After Effects', 'Fusion 360', 'Bambu Lab'];
+  const codeBadges = ['React', 'JSON', 'C', 'HTML', 'Arduino', 'Raspberry Pi'];
+  const skillCategories = [
+    {
+      title: 'Video & Story',
+      details: ['Directing + cinematography', 'Color grading & motion graphics', 'Client-ready promos']
+    },
+    {
+      title: 'Web & Apps',
+      details: ['Responsive React frontends', 'JSON API wrangling', 'UI polish + animation']
+    },
+    {
+      title: 'Hardware & Fabrication',
+      details: ['Embedded prototyping', '3D modeling + printing', 'Testing on Arduino/RPi stacks']
+    }
+  ];
+
+  return (
+    <PageWrapper>
+      <div className="max-w-4xl mx-auto py-8">
+        <SectionTitle title="Skills" icon={<Cpu className="w-6 h-6" />} />
+
+        <div className="space-y-8">
+          <TiltCard delay="delay-100">
+            <div className="flex flex-col md:flex-row gap-8">
+              <div className="flex-1 space-y-4">
+                <p className="text-xs font-mono text-blue-400 uppercase tracking-[0.4em]">Videography</p>
+                <h3 className="text-3xl font-display font-bold text-white leading-snug">
+                  Full-service video production: concept, shoot, edit, deliver.
+                </h3>
+                <p className="text-sm text-zinc-400">
+                  I storyboard, direct, and edit commercials, short films, and promo videos—often blending practical effects with motion graphics to highlight product stories.
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {videoServices.map((service) => (
+                    <Badge key={service} text={service} />
+                  ))}
+                </div>
+                <a
+                  href="https://www.youtube.com/@Abraham79065"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-red-500/10 border border-red-500/40 text-red-300 text-sm font-semibold uppercase tracking-widest hover:bg-red-500/20 transition-colors w-fit"
+                >
+                  <Youtube className="w-4 h-4" />
+                  Visit YouTube Channel
+                </a>
+              </div>
+              <div className="flex-1 space-y-4">
+                <div className="p-4 rounded-2xl bg-zinc-900/60 border border-zinc-800">
+                  <div className="flex items-center justify-between mb-4">
+                    <p className="text-xs font-mono text-zinc-500 uppercase tracking-[0.3em]">Services</p>
+                    <Video className="w-5 h-5 text-blue-400" />
+                  </div>
+                  <ul className="space-y-3 text-sm text-zinc-400">
+                    <li>• Dynamic commercials that blend hardware shots with UI overlays.</li>
+                    <li>• Short-form storytelling with cinematic lighting and audio.</li>
+                    <li>• Promo videos for hackathons, clubs, and campus events.</li>
+                  </ul>
+                </div>
+                <div className="p-4 rounded-2xl bg-zinc-900/60 border border-zinc-800">
+                  <p className="text-xs font-mono text-zinc-500 uppercase tracking-[0.3em] mb-2">Gear</p>
+                  <p className="text-sm text-zinc-200">Panasonic full-frame mirrorless bodies, gimbal rigs, drones, modular audio setups.</p>
+                </div>
+              </div>
             </div>
-            <div className="flex-1">
-              <h3 className="font-display font-bold text-zinc-100 text-lg group-hover:text-blue-400 transition-colors tracking-wide">Email</h3>
-              <p className="text-sm text-zinc-500 font-sans">contact@abrahamguo.com</p>
+          </TiltCard>
+
+          <TiltCard delay="delay-200">
+            <div className="space-y-4">
+              <p className="text-xs font-mono text-purple-400 uppercase tracking-[0.4em]">Tools & Pipelines</p>
+              <h3 className="text-2xl font-display font-bold text-white">Software I can run confidently</h3>
+              <p className="text-sm text-zinc-400">Color grading suites, motion design, and CAD workflows that I use daily.</p>
+              <div className="flex flex-wrap gap-2">
+                {toolBadges.map((tool) => (
+                  <Badge key={tool} text={tool} />
+                ))}
+              </div>
             </div>
-            <ExternalLink className="w-5 h-5 text-zinc-700 group-hover:text-zinc-400 transition-colors" />
+          </TiltCard>
+
+          <TiltCard delay="delay-300">
+            <div className="space-y-4">
+              <p className="text-xs font-mono text-green-400 uppercase tracking-[0.4em]">Prototyping & Code</p>
+              <h3 className="text-2xl font-display font-bold text-white">From firmware to frontends</h3>
+              <p className="text-sm text-zinc-400">
+                I prototype with Arduino and Raspberry Pi to build cool projects for school and fun, then tie everything together with React dashboards or firmware tweaks.
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {codeBadges.map((skill) => (
+                  <Badge key={skill} text={skill} />
+                ))}
+              </div>
+            </div>
+          </TiltCard>
+
+          <TiltCard delay="delay-350">
+            <div className="space-y-4">
+              <p className="text-xs font-mono text-blue-300 uppercase tracking-[0.4em]">Skill Categories</p>
+              <h3 className="text-2xl font-display font-bold text-white">Where I plug in fastest</h3>
+              <div className="grid gap-4 md:grid-cols-3">
+                {skillCategories.map((category) => (
+                  <div key={category.title} className="p-4 rounded-2xl bg-zinc-900/60 border border-zinc-800 space-y-2">
+                    <p className="text-sm font-display text-blue-400">{category.title}</p>
+                    <ul className="text-xs text-zinc-400 space-y-1">
+                      {category.details.map((detail) => (
+                        <li key={detail}>• {detail}</li>
+                      ))}
+                    </ul>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </TiltCard>
+        </div>
+      </div>
+    </PageWrapper>
+  );
+};
+
+const Contact = () => {
+  const contactChannels = [
+    {
+      title: 'LinkedIn',
+      subtitle: '@abraham-guo',
+      description: 'Reach out for collaboration, recruiting, or speaking.',
+      href: 'https://www.linkedin.com/in/abraham-guo/',
+      accent: 'text-blue-400 bg-blue-500/10 border-blue-500/20',
+      icon: <Linkedin className="w-6 h-6 text-blue-400" />
+    },
+    {
+      title: 'GitHub',
+      subtitle: '@Abraham77967',
+      description: 'Browse neural experiments, creative coding, and utilities.',
+      href: 'https://github.com/Abraham77967',
+      accent: 'text-purple-400 bg-purple-500/10 border-purple-500/20',
+      icon: <Github className="w-6 h-6 text-purple-400" />
+    },
+    {
+      title: 'Email',
+      subtitle: 'abrahamg7797@gmail.com',
+      description: 'Fastest way for detailed project briefs or intros.',
+      href: 'mailto:abrahamg7797@gmail.com',
+      accent: 'text-cyan-400 bg-cyan-500/10 border-cyan-500/20',
+      icon: <Mail className="w-6 h-6 text-cyan-400" />
+    }
+  ];
+
+  const quickFacts = [
+    {
+      label: 'Current Base',
+      value: 'Champaign, IL',
+      icon: <MapPin className="w-4 h-4 text-blue-400" />
+    },
+    {
+      label: 'Response Time',
+      value: '< 24 hours',
+      icon: <Zap className="w-4 h-4 text-yellow-400" />
+    },
+    {
+      label: 'Focus Stack',
+      value: 'Video • Web Dev • App Dev',
+      icon: <Cpu className="w-4 h-4 text-purple-400" />
+    }
+  ];
+
+  return (
+    <PageWrapper>
+      <div className="max-w-4xl mx-auto py-8">
+        <SectionTitle title="Get in Touch" icon={<Mail className="w-6 h-6" />} />
+        
+        <div className="space-y-10">
+          <TiltCard delay="delay-100">
+            <div className="grid gap-8 md:grid-cols-[1.5fr_1fr] items-center">
+              <div className="space-y-4">
+                <p className="text-xs font-mono text-blue-400 uppercase tracking-[0.4em]">Availability</p>
+                <h3 className="text-3xl md:text-4xl font-display font-bold text-white leading-tight">
+                  UIUC student builder looking for internships, co-ops, and side projects to push video + tech.
+                </h3>
+                <p className="text-sm text-zinc-400">
+                  I’m actively hunting for teams that need rapid prototyping, production-ready storytelling, or embedded builds. Dive into the Skills page for a full breakdown of cameras, code, and fabrication tools I work with.
+                </p>
+                <div className="flex flex-wrap gap-4">
+                  <a
+                    href="mailto:abrahamg7797@gmail.com"
+                    className="px-5 py-2 rounded-xl bg-blue-600 text-white text-sm font-semibold uppercase tracking-wider shadow-lg shadow-blue-900/20 hover:bg-blue-500 transition-colors"
+                  >
+                    Email Me
+                  </a>
+                  <a
+                    href="https://www.linkedin.com/in/abraham-guo/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="px-5 py-2 rounded-xl border border-zinc-800 text-zinc-200 text-sm font-semibold uppercase tracking-wider hover:border-blue-500/50 hover:text-blue-400 transition-colors"
+                  >
+                    LinkedIn DM
+                  </a>
+                </div>
+              </div>
+              <div className="p-6 rounded-2xl bg-gradient-to-br from-blue-500/10 to-purple-500/5 border border-zinc-800 shadow-inner space-y-4">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-mono text-zinc-500 uppercase tracking-[0.4em]">Status</span>
+                  <span className="flex items-center gap-2 text-xs font-mono text-blue-400">
+                    <span className="h-2 w-2 rounded-full bg-green-400 animate-pulse"></span>
+                    Active
+                  </span>
+                </div>
+                <p className="text-sm text-zinc-300">
+                  Open for internships, contract builds, and film-tech partnerships through 2025.
+                </p>
+                <div className="text-xs text-zinc-500 font-mono">
+                  Last updated: {new Date().toLocaleDateString()}
+                </div>
+              </div>
+            </div>
+          </TiltCard>
+
+          <div className="grid gap-4 md:grid-cols-3">
+            {quickFacts.map((fact, idx) => (
+              <TiltCard key={fact.label} delay={`delay-${150 + idx * 50}`}>
+                <div className="flex items-center gap-3">
+                  <div className="p-3 rounded-xl bg-zinc-900 border border-zinc-800">
+                    {fact.icon}
+                  </div>
+                  <div>
+                    <p className="text-xs font-mono text-zinc-500 uppercase tracking-[0.3em]">{fact.label}</p>
+                    <p className="text-sm text-zinc-200">{fact.value}</p>
+                  </div>
+                </div>
+              </TiltCard>
+            ))}
+          </div>
+
+          <div className="grid gap-6 md:grid-cols-2">
+            {contactChannels.map((channel, index) => (
+              <a key={channel.title} href={channel.href} target="_blank" rel="noopener noreferrer">
+                <TiltCard delay={`delay-${200 + index * 100}`} className="group h-full">
+                  <div className="flex flex-col h-full gap-4">
+                    <div className="flex items-center justify-between">
+                      <div className={`p-3 rounded-2xl border ${channel.accent} transition-all duration-300 group-hover:scale-105`}>
+                        {channel.icon}
+                      </div>
+                      <ExternalLink className="w-5 h-5 text-zinc-600 group-hover:text-zinc-200 transition-colors" />
+                    </div>
+                    <div>
+                      <p className="text-xs font-mono text-zinc-500 uppercase tracking-[0.3em]">Channel</p>
+                      <h3 className="font-display text-2xl font-bold text-white group-hover:text-blue-400 transition-colors tracking-wide">
+                        {channel.title}
+                      </h3>
+                      <p className="text-sm text-zinc-400 font-mono mt-1">{channel.subtitle}</p>
+                    </div>
+                    <p className="text-sm text-zinc-500 font-sans flex-1">{channel.description}</p>
+                    <div className="flex items-center gap-2 text-xs font-mono text-zinc-400">
+                      <span className="h-2 w-2 rounded-full bg-blue-400 animate-pulse"></span>
+                      Tap to open
+                    </div>
+                  </div>
           </TiltCard>
         </a>
+            ))}
+          </div>
       </div>
     </div>
   </PageWrapper>
 );
+};
 
 const NeuralLab = () => {
   const [lastGesture, setLastGesture] = useState<string | null>(null);
@@ -463,9 +805,63 @@ const Test = () => (
 
 const App: React.FC = () => {
   const [page, setPage] = useState('home');
+  const [isLoading, setIsLoading] = useState(true);
+  const equalizerBars = Array.from({ length: 7 }, (_, i) => i);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setIsLoading(false), 1700);
+    return () => clearTimeout(timer);
+  }, []);
 
   return (
     <div className="min-h-screen bg-[#09090b] text-zinc-200 font-sans selection:bg-blue-500/30 relative overflow-hidden">
+      {isLoading && (
+        <div className="fixed inset-0 z-50 bg-[#050505] text-white overflow-hidden flex items-center justify-center">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(59,130,246,0.08),transparent_60%)]"></div>
+          <div className="absolute inset-0 bg-[linear-gradient(120deg,rgba(59,130,246,0.08),transparent,rgba(147,51,234,0.08))] animate-[spin_18s_linear_infinite] opacity-40"></div>
+          <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.04)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.04)_1px,transparent_1px)] bg-[size:140px_140px] translate-y-[-8px] animate-[pulse_4s_ease-in-out_infinite] opacity-40"></div>
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/80"></div>
+
+          <div className="relative z-10 flex flex-col items-center gap-6">
+            <div className="relative w-32 h-32">
+              <div className="absolute inset-0 rounded-full border border-white/10"></div>
+              <div className="absolute inset-1 rounded-full border border-blue-400/30 animate-[spin_6s_linear_infinite]"></div>
+              <div className="absolute inset-4 rounded-full border border-purple-500/40 animate-[spin_4s_linear_infinite_reverse]"></div>
+              <div className="absolute inset-8 rounded-full border border-cyan-400/30 animate-[spin_3s_linear_infinite]"></div>
+              <div className="absolute inset-10 rounded-full bg-blue-500/30 blur-2xl"></div>
+              <div className="absolute inset-0 flex items-center justify-center">
+                <span className="text-4xl font-black tracking-widest">A</span>
+              </div>
+              <div className="absolute inset-[-22px] pointer-events-none">
+                <div className="absolute inset-0 animate-[orbit_9s_linear_infinite]">
+                  <span className="absolute -top-1 left-1/2 -translate-x-1/2 w-2 h-2 rounded-full bg-white shadow-[0_0_12px_rgba(255,255,255,0.9)]"></span>
+                  <span className="absolute top-1/2 -translate-y-1/2 -right-1 w-2 h-2 rounded-full bg-blue-400 shadow-[0_0_15px_rgba(59,130,246,0.9)]"></span>
+                  <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 rounded-full bg-purple-300 shadow-[0_0_12px_rgba(192,132,252,0.9)]"></span>
+                </div>
+              </div>
+            </div>
+            <div className="text-center space-y-2">
+              <p className="text-xs font-mono tracking-[0.5em] text-zinc-400">NEURAL INTERFACE</p>
+              <p className="text-2xl font-display tracking-[0.3em] uppercase">Booting Sequence</p>
+            </div>
+            <div className="w-64 h-1.5 bg-zinc-800 rounded-full overflow-hidden">
+              <div className="h-full bg-gradient-to-r from-blue-500 via-cyan-400 to-purple-500 animate-[progressBar_1.3s_ease-in-out_infinite]"></div>
+            </div>
+            <div className="flex items-end justify-center gap-1 h-10 w-32">
+              {equalizerBars.map((bar) => (
+                <span
+                  key={bar}
+                  className="w-1.5 h-full rounded-full bg-gradient-to-t from-blue-600 via-cyan-300 to-white animate-[equalizer_1.1s_ease-in-out_infinite]"
+                  style={{ animationDelay: `${bar * 0.12}s` }}
+                />
+              ))}
+            </div>
+            <p className="text-[10px] font-mono text-zinc-400 tracking-[0.4em] uppercase animate-[flicker_2.4s_linear_infinite]">
+              SIGNAL HANDSHAKE · CALIBRATING SENSORS · READY
+            </p>
+          </div>
+        </div>
+      )}
       
       {/* Particle Background */}
       <ParticlesBackground />
@@ -487,9 +883,10 @@ const App: React.FC = () => {
           <div className="hidden md:flex items-center gap-1">
             <NavItem id="home" label="Profile" icon={<User className="w-4 h-4"/>} active={page === 'home'} onClick={setPage} />
             <NavItem id="experience" label="Experience" icon={<Briefcase className="w-4 h-4"/>} active={page === 'experience'} onClick={setPage} />
+            <NavItem id="projects" label="Projects" icon={<Code2 className="w-4 h-4"/>} active={page === 'projects'} onClick={setPage} />
+            <NavItem id="skills" label="Skills" icon={<Terminal className="w-4 h-4"/>} active={page === 'skills'} onClick={setPage} />
             <NavItem id="education" label="Education" icon={<GraduationCap className="w-4 h-4"/>} active={page === 'education'} onClick={setPage} />
             <NavItem id="contact" label="Contact" icon={<Mail className="w-4 h-4"/>} active={page === 'contact'} onClick={setPage} />
-            <NavItem id="test" label="Test" icon={<Box className="w-4 h-4"/>} active={page === 'test'} onClick={setPage} />
           </div>
 
           <button 
@@ -511,14 +908,17 @@ const App: React.FC = () => {
       <div className="md:hidden fixed bottom-6 left-1/2 -translate-x-1/2 bg-zinc-900/90 backdrop-blur-xl border border-zinc-800 p-2 z-50 flex items-center gap-1 rounded-full shadow-2xl shadow-black/50">
          <button onClick={() => setPage('home')} className={`p-3 rounded-full transition-all ${page === 'home' ? 'bg-blue-500 text-white shadow-lg shadow-blue-500/30' : 'text-zinc-500 hover:bg-zinc-800'}`}><User size={20}/></button>
          <button onClick={() => setPage('experience')} className={`p-3 rounded-full transition-all ${page === 'experience' ? 'bg-blue-500 text-white shadow-lg shadow-blue-500/30' : 'text-zinc-500 hover:bg-zinc-800'}`}><Briefcase size={20}/></button>
-         <button onClick={() => setPage('test')} className={`p-3 rounded-full transition-all ${page === 'test' ? 'bg-blue-500 text-white shadow-lg shadow-blue-500/30' : 'text-zinc-500 hover:bg-zinc-800'}`}><Box size={20}/></button>
+         <button onClick={() => setPage('projects')} className={`p-3 rounded-full transition-all ${page === 'projects' ? 'bg-blue-500 text-white shadow-lg shadow-blue-500/30' : 'text-zinc-500 hover:bg-zinc-800'}`}><Code2 size={20}/></button>
+         <button onClick={() => setPage('skills')} className={`p-3 rounded-full transition-all ${page === 'skills' ? 'bg-blue-500 text-white shadow-lg shadow-blue-500/30' : 'text-zinc-500 hover:bg-zinc-800'}`}><Terminal size={20}/></button>
          <button onClick={() => setPage('neural')} className={`p-3 rounded-full transition-all ${page === 'neural' ? 'bg-blue-500 text-white shadow-lg shadow-blue-500/30' : 'text-zinc-500 hover:bg-zinc-800'}`}><Cpu size={20}/></button>
       </div>
 
       {/* Main Content */}
-      <main className="relative z-10 px-4 pb-32 md:pb-12 pt-8 min-h-[calc(100vh-64px)]">
+      <main className={`relative z-10 px-4 pb-32 md:pb-12 pt-8 min-h-[calc(100vh-64px)] transition-opacity duration-700 ${isLoading ? 'opacity-0' : 'opacity-100'}`}>
         {page === 'home' && <Home setPage={setPage} />}
         {page === 'experience' && <Experience />}
+        {page === 'projects' && <Projects setPage={setPage} />}
+        {page === 'skills' && <Skills />}
         {page === 'education' && <Education />}
         {page === 'contact' && <Contact />}
         {page === 'test' && <Test />}
