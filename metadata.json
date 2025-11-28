@@ -1,0 +1,7 @@
+{
+  "name": "Copy of Neural Hand Interface",
+  "description": "A real-time hand gesture recognition interface using MediaPipe. Detects a 5-finger pinch to activate directional tracking.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
