@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Abraham Guo | Neural Interface</title>
+    <title>Abraham Guo | Control Interface</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -117,6 +117,53 @@
         60% { transform: skew(-1deg); }
         80% { transform: skew(1deg); }
         100% { transform: skew(0deg); }
+      }
+
+      @keyframes overlayIn {
+        0% { opacity: 0; transform: scale(1.05); filter: blur(8px); }
+        100% { opacity: 1; transform: scale(1); filter: blur(0); }
+      }
+
+      @keyframes overlayOut {
+        0% { opacity: 1; transform: scale(1); filter: blur(0); }
+        100% { opacity: 0; transform: scale(0.98); filter: blur(6px); }
+      }
+
+      @keyframes contentIn {
+        0% { opacity: 0; transform: translateY(24px) scale(0.97); filter: blur(10px); }
+        100% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+      }
+
+      @keyframes morph {
+        0%, 100% { 
+          clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+          transform: rotate(0deg) scale(1);
+        }
+        25% { 
+          clip-path: polygon(30% 0%, 100% 0%, 100% 70%, 70% 100%, 0% 100%, 0% 30%);
+          transform: rotate(90deg) scale(1.05);
+        }
+        50% { 
+          clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+          transform: rotate(180deg) scale(1);
+        }
+        75% { 
+          clip-path: polygon(30% 0%, 100% 0%, 100% 70%, 70% 100%, 0% 100%, 0% 30%);
+          transform: rotate(270deg) scale(1.05);
+        }
+      }
+
+      @keyframes wave {
+        0% { transform: translateX(0) translateY(0); }
+        25% { transform: translateX(-50px) translateY(-20px); }
+        50% { transform: translateX(-100px) translateY(0); }
+        75% { transform: translateX(-50px) translateY(20px); }
+        100% { transform: translateX(0) translateY(0); }
+      }
+
+      @keyframes bounce {
+        0%, 100% { transform: translateY(0); opacity: 0.7; }
+        50% { transform: translateY(-10px); opacity: 1; }
       }
 
       .animate-enter {

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { HandGestureRecognizer } from './components/HandGestureRecognizer';
 import ParticlesBackground from './components/ParticlesBackground';
 import { ThreeDView } from './components/ThreeDView';
@@ -148,7 +148,7 @@ const Home = ({ setPage }: { setPage: (p: string) => void }) => (
                <div className="w-16 h-16 bg-zinc-950 rounded-2xl flex items-center justify-center mx-auto mb-6 border border-zinc-800 group-hover:border-blue-500/50 transition-colors shadow-lg group-hover:shadow-[0_0_20px_rgba(59,130,246,0.4)]">
                  <Cpu className="w-8 h-8 text-blue-500" />
                </div>
-               <h3 className="text-2xl font-display font-bold text-white mb-2 group-hover:text-blue-400 transition-colors uppercase tracking-wide">Neural Lab</h3>
+               <h3 className="text-2xl font-display font-bold text-white mb-2 group-hover:text-blue-400 transition-colors uppercase tracking-wide">Gesture Lab</h3>
                <p className="text-sm text-zinc-400 mb-6 font-sans">Enter the gesture control experiment.</p>
                <span className="text-xs font-mono text-blue-400 border border-blue-500/20 bg-blue-500/5 px-3 py-1 rounded-full group-hover:bg-blue-500/20 transition-colors">
                   TRY IT NOW &rarr;
@@ -558,7 +558,7 @@ const Contact = () => {
     {
       title: 'GitHub',
       subtitle: '@Abraham77967',
-      description: 'Browse neural experiments, creative coding, and utilities.',
+      description: 'Browse interaction experiments, creative coding, and utilities.',
       href: 'https://github.com/Abraham77967',
       accent: 'text-purple-400 bg-purple-500/10 border-purple-500/20',
       icon: <Github className="w-6 h-6 text-purple-400" />
@@ -658,33 +658,82 @@ const Contact = () => {
             ))}
           </div>
 
-          <div className="grid gap-6 md:grid-cols-2">
-            {contactChannels.map((channel, index) => (
-              <a key={channel.title} href={channel.href} target="_blank" rel="noopener noreferrer">
-                <TiltCard delay={`delay-${200 + index * 100}`} className="group h-full">
-                  <div className="flex flex-col h-full gap-4">
-                    <div className="flex items-center justify-between">
-                      <div className={`p-3 rounded-2xl border ${channel.accent} transition-all duration-300 group-hover:scale-105`}>
-                        {channel.icon}
-                      </div>
-                      <ExternalLink className="w-5 h-5 text-zinc-600 group-hover:text-zinc-200 transition-colors" />
+          <div className="space-y-6">
+            {/* Primary: LinkedIn */}
+            <a
+              href={contactChannels[0].href}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <TiltCard delay="delay-200" className="group h-full">
+                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+                  <div className="flex items-center gap-4">
+                    <div className={`p-4 rounded-2xl border ${contactChannels[0].accent} transition-all duration-300 group-hover:scale-110`}>
+                      {contactChannels[0].icon}
                     </div>
                     <div>
-                      <p className="text-xs font-mono text-zinc-500 uppercase tracking-[0.3em]">Channel</p>
-                      <h3 className="font-display text-2xl font-bold text-white group-hover:text-blue-400 transition-colors tracking-wide">
-                        {channel.title}
+                      <p className="text-xs font-mono text-blue-400 uppercase tracking-[0.3em]">Primary Channel</p>
+                      <h3 className="font-display text-3xl font-bold text-white group-hover:text-blue-400 transition-colors tracking-wide">
+                        LinkedIn
                       </h3>
-                      <p className="text-sm text-zinc-400 font-mono mt-1">{channel.subtitle}</p>
-                    </div>
-                    <p className="text-sm text-zinc-500 font-sans flex-1">{channel.description}</p>
-                    <div className="flex items-center gap-2 text-xs font-mono text-zinc-400">
-                      <span className="h-2 w-2 rounded-full bg-blue-400 animate-pulse"></span>
-                      Tap to open
+                      <p className="text-sm text-zinc-400 font-mono mt-1">
+                        {contactChannels[0].subtitle}
+                      </p>
                     </div>
                   </div>
-          </TiltCard>
-        </a>
-            ))}
+                  <div className="flex flex-col items-start md:items-end gap-3 text-sm text-zinc-400 font-sans">
+                    <p>{contactChannels[0].description}</p>
+                    <div className="inline-flex items-center gap-2 text-xs font-mono text-blue-300">
+                      <span className="h-2 w-2 rounded-full bg-blue-400 animate-pulse" />
+                      Tap to open profile
+                    </div>
+                  </div>
+                </div>
+              </TiltCard>
+            </a>
+
+            {/* Secondary: Email */}
+            <a
+              href={contactChannels[2].href}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <TiltCard delay="delay-300" className="group h-full">
+                <div className="flex items-center gap-4">
+                  <div className={`p-3 rounded-2xl border ${contactChannels[2].accent} transition-all duration-300 group-hover:scale-110`}>
+                    {contactChannels[2].icon}
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-xs font-mono text-zinc-500 uppercase tracking-[0.3em]">
+                      Direct Email
+                    </p>
+                    <h3 className="font-display text-2xl font-bold text-white group-hover:text-cyan-300 transition-colors tracking-wide">
+                      Email
+                    </h3>
+                    <p className="text-sm text-zinc-300 font-mono mt-1">
+                      {contactChannels[2].subtitle}
+                    </p>
+                    <p className="text-sm text-zinc-500 font-sans mt-2">
+                      {contactChannels[2].description}
+                    </p>
+                  </div>
+                  <ExternalLink className="w-5 h-5 text-zinc-600 group-hover:text-zinc-200 transition-colors" />
+                </div>
+              </TiltCard>
+            </a>
+
+            {/* Tertiary: GitHub as a compact pill */}
+            <div className="flex justify-end">
+              <a
+                href={contactChannels[1].href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-zinc-900 border border-zinc-700 text-xs font-mono text-zinc-400 hover:border-purple-400/60 hover:text-purple-300 hover:bg-zinc-800 transition-colors"
+              >
+                <Github className="w-4 h-4 text-purple-300" />
+                <span>github.com/{contactChannels[1].subtitle.replace('@', '')}</span>
+              </a>
+            </div>
           </div>
       </div>
     </div>
@@ -708,7 +757,7 @@ const NeuralLab = () => {
             <div className="absolute inset-0 bg-blue-500/20 blur-xl rounded-full animate-pulse"></div>
             <Cpu className="w-10 h-10 relative z-10" />
           </div>
-          <h1 className="text-5xl md:text-6xl font-display font-bold text-white mb-4 tracking-tight glitch-text uppercase" data-text="Neural Interface Lab">Neural Interface Lab</h1>
+          <h1 className="text-5xl md:text-6xl font-display font-bold text-white mb-4 tracking-tight glitch-text uppercase" data-text="Gesture Interface Lab">Gesture Interface Lab</h1>
           <p className="text-zinc-400 max-w-lg text-lg leading-relaxed font-sans">
             Real-time hand gesture recognition running locally in your browser via <span className="text-zinc-200 font-mono bg-zinc-800 px-2 py-0.5 rounded text-sm border border-zinc-700">MediaPipe</span>.
           </p>
@@ -806,124 +855,243 @@ const Test = () => (
 const App: React.FC = () => {
   const [page, setPage] = useState('home');
   const [isLoading, setIsLoading] = useState(true);
-  const equalizerBars = Array.from({ length: 7 }, (_, i) => i);
+  const [showOverlay, setShowOverlay] = useState(true);
+  const loaderCanvasRef = useRef<HTMLCanvasElement | null>(null);
+  const phaseRef = useRef<'intro' | 'outro'>('intro');
 
+  // Turn off loader after a slightly longer delay (start main-content fade-in + particle outro)
   useEffect(() => {
-    const timer = setTimeout(() => setIsLoading(false), 1700);
+    const timer = setTimeout(() => {
+      phaseRef.current = 'outro';
+      setIsLoading(false);
+    }, 2300);
     return () => clearTimeout(timer);
   }, []);
 
+  // Keep overlay mounted a bit longer for a smooth fade-out
+  useEffect(() => {
+    if (!isLoading) {
+      const timer = setTimeout(() => setShowOverlay(false), 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [isLoading]);
+
+  // Particle-based loading animation with 40% blue / 40% white / 20% pink
+  // Intro: particles spiral outward, Outro: particles collapse toward center while overlay fades
+  useEffect(() => {
+    if (!showOverlay) return;
+
+    const canvas = loaderCanvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    const resize = () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    };
+    resize();
+
+    type ParticleType = {
+      angle: number;
+      radius: number;
+      speed: number;
+      drift: number;
+      size: number;
+      color: string;
+      reset: () => void;
+      update: () => void;
+      draw: () => void;
+    };
+
+    const pickColor = () => {
+      const r = Math.random();
+      if (r < 0.4) return 'rgba(59,130,246,'; // blue
+      if (r < 0.8) return 'rgba(255,255,255,'; // white
+      return 'rgba(236,72,153,'; // pink
+    };
+
+    class Particle implements ParticleType {
+      angle: number;
+      radius: number;
+      speed: number;
+      drift: number;
+      size: number;
+      color: string;
+
+      constructor() {
+        this.angle = Math.random() * Math.PI * 2;
+        this.radius = Math.random() * Math.min(canvas.width, canvas.height) * 0.15;
+        this.speed = 0.002 + Math.random() * 0.01;
+        this.drift = 0.2 + Math.random() * 0.4;
+        this.size = Math.random() * 2.2 + 0.8;
+        this.color = pickColor();
+      }
+
+      reset() {
+        this.angle = Math.random() * Math.PI * 2;
+        this.radius = Math.random() * (Math.min(canvas.width, canvas.height) * 0.15);
+        this.speed = 0.002 + Math.random() * 0.01;
+        this.drift = 0.2 + Math.random() * 0.4;
+        this.size = Math.random() * 2.2 + 0.8;
+        this.color = pickColor();
+      }
+
+      update() {
+        this.angle += this.speed;
+        this.radius += this.drift;
+
+        const maxRadius = Math.max(canvas.width, canvas.height);
+        if (this.radius > maxRadius * 0.6) {
+          this.reset();
+        }
+
+        this.draw();
+      }
+
+      draw() {
+        const centerX = canvas.width / 2;
+        const centerY = canvas.height / 2;
+        const x = centerX + Math.cos(this.angle) * this.radius;
+        const y = centerY + Math.sin(this.angle) * this.radius;
+        const alpha = 0.4 + Math.sin(this.radius * 0.02) * 0.4;
+        ctx.beginPath();
+        ctx.fillStyle = `${this.color}${alpha})`;
+        ctx.arc(x, y, this.size, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+
+    const particles: Particle[] = Array.from({ length: 220 }, () => new Particle());
+
+    const handleResize = () => {
+      resize();
+      particles.forEach((p) => p.reset());
+    };
+
+    window.addEventListener('resize', handleResize);
+
+    let animationFrameId: number;
+    const animate = () => {
+      if (!canvas.isConnected) return;
+
+      const phase = phaseRef.current;
+      ctx.fillStyle = phase === 'intro'
+        ? 'rgba(2, 2, 12, 0.5)'
+        : 'rgba(2, 2, 20, 0.85)';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      particles.forEach((p) => {
+        if (phase === 'intro') {
+          // spiral outward
+          p.update();
+        } else {
+          // collapse toward center with a slight swirl
+          p.radius *= 0.94;
+          p.angle += p.speed * 1.2;
+          if (p.radius < 4) {
+            // keep a faint glow near center
+            p.radius = 4;
+          }
+          p.draw();
+        }
+      });
+
+      animationFrameId = requestAnimationFrame(animate);
+    };
+
+    animate();
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      if (animationFrameId) cancelAnimationFrame(animationFrameId);
+    };
+  }, [showOverlay]);
+
   return (
     <div className="min-h-screen bg-[#09090b] text-zinc-200 font-sans selection:bg-blue-500/30 relative overflow-hidden">
-      {isLoading && (
-        <div className="fixed inset-0 z-50 bg-[#050505] text-white overflow-hidden flex items-center justify-center">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(59,130,246,0.08),transparent_60%)]"></div>
-          <div className="absolute inset-0 bg-[linear-gradient(120deg,rgba(59,130,246,0.08),transparent,rgba(147,51,234,0.08))] animate-[spin_18s_linear_infinite] opacity-40"></div>
-          <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.04)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.04)_1px,transparent_1px)] bg-[size:140px_140px] translate-y-[-8px] animate-[pulse_4s_ease-in-out_infinite] opacity-40"></div>
-          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/80"></div>
-
-          <div className="relative z-10 flex flex-col items-center gap-6">
-            <div className="relative w-32 h-32">
-              <div className="absolute inset-0 rounded-full border border-white/10"></div>
-              <div className="absolute inset-1 rounded-full border border-blue-400/30 animate-[spin_6s_linear_infinite]"></div>
-              <div className="absolute inset-4 rounded-full border border-purple-500/40 animate-[spin_4s_linear_infinite_reverse]"></div>
-              <div className="absolute inset-8 rounded-full border border-cyan-400/30 animate-[spin_3s_linear_infinite]"></div>
-              <div className="absolute inset-10 rounded-full bg-blue-500/30 blur-2xl"></div>
-              <div className="absolute inset-0 flex items-center justify-center">
-                <span className="text-4xl font-black tracking-widest">A</span>
-              </div>
-              <div className="absolute inset-[-22px] pointer-events-none">
-                <div className="absolute inset-0 animate-[orbit_9s_linear_infinite]">
-                  <span className="absolute -top-1 left-1/2 -translate-x-1/2 w-2 h-2 rounded-full bg-white shadow-[0_0_12px_rgba(255,255,255,0.9)]"></span>
-                  <span className="absolute top-1/2 -translate-y-1/2 -right-1 w-2 h-2 rounded-full bg-blue-400 shadow-[0_0_15px_rgba(59,130,246,0.9)]"></span>
-                  <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 rounded-full bg-purple-300 shadow-[0_0_12px_rgba(192,132,252,0.9)]"></span>
-                </div>
-              </div>
-            </div>
-            <div className="text-center space-y-2">
-              <p className="text-xs font-mono tracking-[0.5em] text-zinc-400">NEURAL INTERFACE</p>
-              <p className="text-2xl font-display tracking-[0.3em] uppercase">Booting Sequence</p>
-            </div>
-            <div className="w-64 h-1.5 bg-zinc-800 rounded-full overflow-hidden">
-              <div className="h-full bg-gradient-to-r from-blue-500 via-cyan-400 to-purple-500 animate-[progressBar_1.3s_ease-in-out_infinite]"></div>
-            </div>
-            <div className="flex items-end justify-center gap-1 h-10 w-32">
-              {equalizerBars.map((bar) => (
-                <span
-                  key={bar}
-                  className="w-1.5 h-full rounded-full bg-gradient-to-t from-blue-600 via-cyan-300 to-white animate-[equalizer_1.1s_ease-in-out_infinite]"
-                  style={{ animationDelay: `${bar * 0.12}s` }}
-                />
-              ))}
-            </div>
-            <p className="text-[10px] font-mono text-zinc-400 tracking-[0.4em] uppercase animate-[flicker_2.4s_linear_infinite]">
-              SIGNAL HANDSHAKE · CALIBRATING SENSORS · READY
-            </p>
-          </div>
+      {showOverlay && (
+        <div
+          className={`fixed inset-0 z-50 bg-[#020214] text-white overflow-hidden flex items-center justify-center ${
+            isLoading
+              ? 'animate-[overlayIn_1s_ease-out_forwards]'
+              : 'animate-[overlayOut_1.1s_ease-in_forwards] pointer-events-none'
+          }`}
+        >
+          <canvas ref={loaderCanvasRef} className="absolute inset-0 w-full h-full" />
+          <div className="absolute inset-0 bg-gradient-to-tr from-blue-600/10 via-transparent to-pink-500/10" />
         </div>
       )}
-      
-      {/* Particle Background */}
-      <ParticlesBackground />
-      
-      {/* Vignette & Gradient Overlay */}
-      <div className="fixed inset-0 bg-gradient-to-b from-transparent via-transparent to-black pointer-events-none z-0" />
-      <div className="fixed inset-0 pointer-events-none z-0 bg-[radial-gradient(circle_at_center,transparent_0%,rgba(0,0,0,0.6)_100%)]" />
+      <div
+        className={`relative ${
+          isLoading
+            ? 'opacity-0 pointer-events-none select-none'
+            : 'opacity-100 animate-[contentIn_1s_cubic-bezier(0.16,1,0.3,1)_forwards]'
+        }`}
+        aria-hidden={isLoading}
+      >
+        {/* Particle Background */}
+        <ParticlesBackground />
+        
+        {/* Vignette & Gradient Overlay */}
+        <div className="fixed inset-0 bg-gradient-to-b from-transparent via-transparent to-black pointer-events-none z-0" />
+        <div className="fixed inset-0 pointer-events-none z-0 bg-[radial-gradient(circle_at_center,transparent_0%,rgba(0,0,0,0.6)_100%)]" />
 
-      {/* Navbar */}
-      <nav className="sticky top-0 z-50 border-b border-zinc-800 bg-[#09090b]/80 backdrop-blur-xl supports-[backdrop-filter]:bg-[#09090b]/60">
-        <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
-          <div className="font-bold text-xl tracking-tight text-white flex items-center gap-3 cursor-pointer group" onClick={() => setPage('home')}>
-            <div className="w-9 h-9 bg-white rounded-xl flex items-center justify-center text-black font-black text-lg shadow-[0_0_15px_rgba(255,255,255,0.3)] transition-all group-hover:scale-110 group-hover:rotate-6 group-hover:bg-blue-400">
-              A
+        {/* Navbar */}
+        <nav className="sticky top-0 z-50 border-b border-zinc-800 bg-[#09090b]/80 backdrop-blur-xl supports-[backdrop-filter]:bg-[#09090b]/60">
+          <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
+            <div className="font-bold text-xl tracking-tight text-white flex items-center gap-3 cursor-pointer group" onClick={() => setPage('home')}>
+              <div className="w-9 h-9 bg-white rounded-xl flex items-center justify-center text-black font-black text-lg shadow-[0_0_15px_rgba(255,255,255,0.3)] transition-all group-hover:scale-110 group-hover:rotate-6 group-hover:bg-blue-400">
+                A
+              </div>
+              <span className="group-hover:text-zinc-100 transition-colors font-display tracking-wide">Abraham<span className="text-blue-500 group-hover:text-white">.</span></span>
             </div>
-            <span className="group-hover:text-zinc-100 transition-colors font-display tracking-wide">Abraham<span className="text-blue-500 group-hover:text-white">.</span></span>
-          </div>
 
-          <div className="hidden md:flex items-center gap-1">
-            <NavItem id="home" label="Profile" icon={<User className="w-4 h-4"/>} active={page === 'home'} onClick={setPage} />
-            <NavItem id="experience" label="Experience" icon={<Briefcase className="w-4 h-4"/>} active={page === 'experience'} onClick={setPage} />
-            <NavItem id="projects" label="Projects" icon={<Code2 className="w-4 h-4"/>} active={page === 'projects'} onClick={setPage} />
-            <NavItem id="skills" label="Skills" icon={<Terminal className="w-4 h-4"/>} active={page === 'skills'} onClick={setPage} />
-            <NavItem id="education" label="Education" icon={<GraduationCap className="w-4 h-4"/>} active={page === 'education'} onClick={setPage} />
-            <NavItem id="contact" label="Contact" icon={<Mail className="w-4 h-4"/>} active={page === 'contact'} onClick={setPage} />
-          </div>
+            <div className="hidden md:flex items-center gap-1">
+              <NavItem id="home" label="Profile" icon={<User className="w-4 h-4"/>} active={page === 'home'} onClick={setPage} />
+              <NavItem id="experience" label="Experience" icon={<Briefcase className="w-4 h-4"/>} active={page === 'experience'} onClick={setPage} />
+              <NavItem id="projects" label="Projects" icon={<Code2 className="w-4 h-4"/>} active={page === 'projects'} onClick={setPage} />
+              <NavItem id="skills" label="Skills" icon={<Terminal className="w-4 h-4"/>} active={page === 'skills'} onClick={setPage} />
+              <NavItem id="education" label="Education" icon={<GraduationCap className="w-4 h-4"/>} active={page === 'education'} onClick={setPage} />
+              <NavItem id="contact" label="Contact" icon={<Mail className="w-4 h-4"/>} active={page === 'contact'} onClick={setPage} />
+            </div>
 
-          <button 
-            onClick={() => setPage('neural')}
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-bold transition-all border tracking-wide group overflow-hidden relative ${
-              page === 'neural' 
-                ? 'bg-blue-500 text-white border-blue-400 shadow-[0_0_20px_rgba(59,130,246,0.4)]' 
-                : 'bg-zinc-900 text-zinc-400 border-zinc-800 hover:border-blue-500/50 hover:text-blue-400 hover:bg-zinc-800'
-            }`}
-          >
-            <div className={`absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full ${page !== 'neural' ? 'group-hover:animate-[shimmer_1s_infinite]' : ''}`} />
-            <Cpu className="w-3 h-3 group-hover:rotate-180 transition-transform duration-500" />
-            <span className="font-display">NEURAL LAB</span>
-          </button>
+            <button 
+              onClick={() => setPage('neural')}
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-bold transition-all border tracking-wide group overflow-hidden relative ${
+                page === 'neural' 
+                  ? 'bg-blue-500 text-white border-blue-400 shadow-[0_0_20px_rgba(59,130,246,0.4)]' 
+                  : 'bg-zinc-900 text-zinc-400 border-zinc-800 hover:border-blue-500/50 hover:text-blue-400 hover:bg-zinc-800'
+              }`}
+            >
+              <div className={`absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full ${page !== 'neural' ? 'group-hover:animate-[shimmer_1s_infinite]' : ''}`} />
+              <Cpu className="w-3 h-3 group-hover:rotate-180 transition-transform duration-500" />
+              <span className="font-display">GESTURE LAB</span>
+            </button>
+          </div>
+        </nav>
+
+        {/* Mobile Nav */}
+        <div className="md:hidden fixed bottom-6 left-1/2 -translate-x-1/2 bg-zinc-900/90 backdrop-blur-xl border border-zinc-800 p-2 z-50 flex items-center gap-1 rounded-full shadow-2xl shadow-black/50">
+           <button onClick={() => setPage('home')} className={`p-3 rounded-full transition-all ${page === 'home' ? 'bg-blue-500 text-white shadow-lg shadow-blue-500/30' : 'text-zinc-500 hover:bg-zinc-800'}`}><User size={20}/></button>
+           <button onClick={() => setPage('experience')} className={`p-3 rounded-full transition-all ${page === 'experience' ? 'bg-blue-500 text-white shadow-lg shadow-blue-500/30' : 'text-zinc-500 hover:bg-zinc-800'}`}><Briefcase size={20}/></button>
+           <button onClick={() => setPage('projects')} className={`p-3 rounded-full transition-all ${page === 'projects' ? 'bg-blue-500 text-white shadow-lg shadow-blue-500/30' : 'text-zinc-500 hover:bg-zinc-800'}`}><Code2 size={20}/></button>
+           <button onClick={() => setPage('skills')} className={`p-3 rounded-full transition-all ${page === 'skills' ? 'bg-blue-500 text-white shadow-lg shadow-blue-500/30' : 'text-zinc-500 hover:bg-zinc-800'}`}><Terminal size={20}/></button>
+           <button onClick={() => setPage('neural')} className={`p-3 rounded-full transition-all ${page === 'neural' ? 'bg-blue-500 text-white shadow-lg shadow-blue-500/30' : 'text-zinc-500 hover:bg-zinc-800'}`}><Cpu size={20}/></button>
         </div>
-      </nav>
 
-      {/* Mobile Nav */}
-      <div className="md:hidden fixed bottom-6 left-1/2 -translate-x-1/2 bg-zinc-900/90 backdrop-blur-xl border border-zinc-800 p-2 z-50 flex items-center gap-1 rounded-full shadow-2xl shadow-black/50">
-         <button onClick={() => setPage('home')} className={`p-3 rounded-full transition-all ${page === 'home' ? 'bg-blue-500 text-white shadow-lg shadow-blue-500/30' : 'text-zinc-500 hover:bg-zinc-800'}`}><User size={20}/></button>
-         <button onClick={() => setPage('experience')} className={`p-3 rounded-full transition-all ${page === 'experience' ? 'bg-blue-500 text-white shadow-lg shadow-blue-500/30' : 'text-zinc-500 hover:bg-zinc-800'}`}><Briefcase size={20}/></button>
-         <button onClick={() => setPage('projects')} className={`p-3 rounded-full transition-all ${page === 'projects' ? 'bg-blue-500 text-white shadow-lg shadow-blue-500/30' : 'text-zinc-500 hover:bg-zinc-800'}`}><Code2 size={20}/></button>
-         <button onClick={() => setPage('skills')} className={`p-3 rounded-full transition-all ${page === 'skills' ? 'bg-blue-500 text-white shadow-lg shadow-blue-500/30' : 'text-zinc-500 hover:bg-zinc-800'}`}><Terminal size={20}/></button>
-         <button onClick={() => setPage('neural')} className={`p-3 rounded-full transition-all ${page === 'neural' ? 'bg-blue-500 text-white shadow-lg shadow-blue-500/30' : 'text-zinc-500 hover:bg-zinc-800'}`}><Cpu size={20}/></button>
+        {/* Main Content */}
+        <main className="relative z-10 px-4 pb-32 md:pb-12 pt-8 min-h-[calc(100vh-64px)]">
+          {page === 'home' && <Home setPage={setPage} />}
+          {page === 'experience' && <Experience />}
+          {page === 'projects' && <Projects setPage={setPage} />}
+          {page === 'skills' && <Skills />}
+          {page === 'education' && <Education />}
+          {page === 'contact' && <Contact />}
+          {page === 'test' && <Test />}
+          {page === 'neural' && <NeuralLab />}
+        </main>
       </div>
-
-      {/* Main Content */}
-      <main className={`relative z-10 px-4 pb-32 md:pb-12 pt-8 min-h-[calc(100vh-64px)] transition-opacity duration-700 ${isLoading ? 'opacity-0' : 'opacity-100'}`}>
-        {page === 'home' && <Home setPage={setPage} />}
-        {page === 'experience' && <Experience />}
-        {page === 'projects' && <Projects setPage={setPage} />}
-        {page === 'skills' && <Skills />}
-        {page === 'education' && <Education />}
-        {page === 'contact' && <Contact />}
-        {page === 'test' && <Test />}
-        {page === 'neural' && <NeuralLab />}
-      </main>
 
     </div>
   );
