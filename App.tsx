@@ -856,22 +856,37 @@ const App: React.FC = () => {
   const [page, setPage] = useState('home');
   const [isLoading, setIsLoading] = useState(true);
   const [showOverlay, setShowOverlay] = useState(true);
+  const [overlayVisible, setOverlayVisible] = useState(false);
   const loaderCanvasRef = useRef<HTMLCanvasElement | null>(null);
   const phaseRef = useRef<'intro' | 'outro'>('intro');
-
-  // Turn off loader after a slightly longer delay (start main-content fade-in + particle outro)
+  
+  // Smooth overlay fade-in on mount
   useEffect(() => {
-    const timer = setTimeout(() => {
-      phaseRef.current = 'outro';
-      setIsLoading(false);
-    }, 2300);
+    const timer = setTimeout(() => setOverlayVisible(true), 10);
     return () => clearTimeout(timer);
   }, []);
 
-  // Keep overlay mounted a bit longer for a smooth fade-out
+  // Turn off loader after a slightly longer delay (start main-content fade-in + particle outro)
+  useEffect(() => {
+    const timer1 = setTimeout(() => {
+      phaseRef.current = 'outro';
+    }, 3450); // 50% longer: 2300 * 1.5
+    
+    // Small delay before content starts appearing for smoother transition
+    const timer2 = setTimeout(() => {
+      setIsLoading(false);
+    }, 3600); // 50% longer: 2400 * 1.5
+    
+    return () => {
+      clearTimeout(timer1);
+      clearTimeout(timer2);
+    };
+  }, []);
+
+  // Keep overlay mounted longer for ultra-smooth fade-out with particle collapse
   useEffect(() => {
     if (!isLoading) {
-      const timer = setTimeout(() => setShowOverlay(false), 1000);
+      const timer = setTimeout(() => setShowOverlay(false), 1800); // 50% longer: 1200 * 1.5
       return () => clearTimeout(timer);
     }
   }, [isLoading]);
@@ -918,51 +933,87 @@ const App: React.FC = () => {
       drift: number;
       size: number;
       color: string;
+      startDelay: number; // For staggered intro appearance
+      introProgress: number; // For smooth intro easing
 
-      constructor() {
+      constructor(index: number, total: number) {
         this.angle = Math.random() * Math.PI * 2;
-        this.radius = Math.random() * Math.min(canvas.width, canvas.height) * 0.15;
-        this.speed = 0.002 + Math.random() * 0.01;
-        this.drift = 0.2 + Math.random() * 0.4;
+        this.radius = Math.random() * Math.min(canvas.width, canvas.height) * 0.15; // Start spread apart like before
+        this.speed = 0.002 + Math.random() * 0.008; // Slightly slower for smoother motion
+        this.drift = 0.15 + Math.random() * 0.3; // Reduced drift for smoother expansion
         this.size = Math.random() * 2.2 + 0.8;
         this.color = pickColor();
+        // Stagger particle appearance for smooth intro
+        this.startDelay = (index / total) * 1.2; // Spread over 1.2 seconds (50% longer)
+        this.introProgress = 0;
       }
 
       reset() {
         this.angle = Math.random() * Math.PI * 2;
-        this.radius = Math.random() * (Math.min(canvas.width, canvas.height) * 0.15);
-        this.speed = 0.002 + Math.random() * 0.01;
-        this.drift = 0.2 + Math.random() * 0.4;
+        this.radius = Math.random() * (Math.min(canvas.width, canvas.height) * 0.15); // Keep spread apart
+        this.speed = 0.002 + Math.random() * 0.008;
+        this.drift = 0.15 + Math.random() * 0.3;
         this.size = Math.random() * 2.2 + 0.8;
         this.color = pickColor();
+        this.introProgress = 0;
       }
 
-      update() {
-        this.angle += this.speed;
-        this.radius += this.drift;
+      update(phase?: 'intro' | 'outro', outroProgress?: number, elapsedTime?: number) {
+        if (phase === 'intro' && elapsedTime !== undefined) {
+          // Ultra-smooth intro with advanced easing
+          const timeSinceStart = Math.max(0, elapsedTime - this.startDelay);
+          if (timeSinceStart > 0) {
+            // Smooth ease-out-expo for very natural acceleration
+            const t = Math.min(timeSinceStart / 1.8, 1); // Normalize to 1.8s (50% longer)
+            // Exponential ease-out for ultra-smooth motion
+            const eased = t === 1 ? 1 : 1 - Math.pow(2, -10 * t);
+            
+            this.introProgress = eased;
+            // Keep original radius but allow normal spiral movement
+            this.angle += this.speed * (0.3 + eased * 0.7); // Start slow, accelerate
+            this.radius += this.drift * eased; // Gradually increase drift speed
+          }
+        } else {
+          // Normal spiral outward
+          this.angle += this.speed;
+          this.radius += this.drift;
+        }
 
         const maxRadius = Math.max(canvas.width, canvas.height);
         if (this.radius > maxRadius * 0.6) {
           this.reset();
         }
 
-        this.draw();
+        this.draw(phase, outroProgress);
       }
 
-      draw() {
+      draw(phase?: 'intro' | 'outro', outroProgress?: number) {
         const centerX = canvas.width / 2;
         const centerY = canvas.height / 2;
         const x = centerX + Math.cos(this.angle) * this.radius;
         const y = centerY + Math.sin(this.angle) * this.radius;
-        const alpha = 0.4 + Math.sin(this.radius * 0.02) * 0.4;
+        
+        let alpha = 0.4 + Math.sin(this.radius * 0.02) * 0.4;
+        let drawSize = this.size;
+        
+        // Smooth fade-in and size growth during intro
+        if (phase === 'intro') {
+          alpha *= this.introProgress; // Fade in as particle expands
+          drawSize *= (0.5 + this.introProgress * 0.5); // Start smaller, grow to full size
+        }
+        // Smoothly fade particles during outro
+        else if (phase === 'outro' && outroProgress !== undefined) {
+          alpha *= (1 - outroProgress * 0.7); // fade to 30% opacity
+        }
+        
         ctx.beginPath();
         ctx.fillStyle = `${this.color}${alpha})`;
-        ctx.arc(x, y, this.size, 0, Math.PI * 2);
+        ctx.arc(x, y, drawSize, 0, Math.PI * 2);
         ctx.fill();
       }
     }
 
-    const particles: Particle[] = Array.from({ length: 220 }, () => new Particle());
+    const particles: Particle[] = Array.from({ length: 220 }, (_, i) => new Particle(i, 220));
 
     const handleResize = () => {
       resize();
@@ -972,28 +1023,43 @@ const App: React.FC = () => {
     window.addEventListener('resize', handleResize);
 
     let animationFrameId: number;
+    let outroProgress = 0;
+    let startTime = performance.now();
     const animate = () => {
       if (!canvas.isConnected) return;
 
       const phase = phaseRef.current;
-      ctx.fillStyle = phase === 'intro'
-        ? 'rgba(2, 2, 12, 0.5)'
-        : 'rgba(2, 2, 20, 0.85)';
+      const elapsedTime = (performance.now() - startTime) / 1000; // Convert to seconds
+      
+      // Smooth background fade during outro
+      if (phase === 'outro') {
+        outroProgress = Math.min(outroProgress + 0.015, 1);
+        const fadeAlpha = 0.5 + (outroProgress * 0.35);
+        ctx.fillStyle = `rgba(2, 2, 20, ${fadeAlpha})`;
+      } else {
+        // Smooth background fade-in during intro
+        const introBgProgress = Math.min(elapsedTime / 1.2, 1); // 50% longer: 0.8 * 1.5
+        const bgAlpha = 0.3 + (introBgProgress * 0.2); // Fade from 0.3 to 0.5
+        ctx.fillStyle = `rgba(2, 2, 12, ${bgAlpha})`;
+      }
+      
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
       particles.forEach((p) => {
         if (phase === 'intro') {
-          // spiral outward
-          p.update();
+          // Smooth intro with easing and staggered appearance
+          p.update(phase, undefined, elapsedTime);
         } else {
-          // collapse toward center with a slight swirl
-          p.radius *= 0.94;
-          p.angle += p.speed * 1.2;
-          if (p.radius < 4) {
+          // ultra-smooth collapse toward center with elegant swirl
+          p.radius *= 0.96; // slightly slower collapse for smoother motion
+          p.angle += p.speed * 1.1;
+          p.size *= 0.995; // gradually shrink particles
+          if (p.radius < 3) {
             // keep a faint glow near center
-            p.radius = 4;
+            p.radius = 3;
+            p.size = Math.max(p.size, 0.3);
           }
-          p.draw();
+          p.draw(phase, outroProgress);
         }
       });
 
@@ -1012,21 +1078,24 @@ const App: React.FC = () => {
     <div className="min-h-screen bg-[#09090b] text-zinc-200 font-sans selection:bg-blue-500/30 relative overflow-hidden">
       {showOverlay && (
         <div
-          className={`fixed inset-0 z-50 bg-[#020214] text-white overflow-hidden flex items-center justify-center ${
-            isLoading
-              ? 'animate-[overlayIn_1s_ease-out_forwards]'
-              : 'animate-[overlayOut_1.1s_ease-in_forwards] pointer-events-none'
+          className={`fixed inset-0 z-50 bg-[#020214] text-white overflow-hidden flex items-center justify-center transition-all duration-[2100ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] will-change-[opacity,transform,filter] ${
+            isLoading && overlayVisible
+              ? 'opacity-100 scale-100 blur-0'
+              : 'opacity-0 scale-[0.98] blur-[8px] pointer-events-none'
           }`}
         >
           <canvas ref={loaderCanvasRef} className="absolute inset-0 w-full h-full" />
-          <div className="absolute inset-0 bg-gradient-to-tr from-blue-600/10 via-transparent to-pink-500/10" />
+          <div 
+            className="absolute inset-0 bg-gradient-to-tr from-blue-600/10 via-transparent to-pink-500/10 transition-opacity duration-[2100ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)]" 
+            style={{ opacity: isLoading && overlayVisible ? 1 : 0 }} 
+          />
         </div>
       )}
       <div
-        className={`relative ${
+        className={`relative transition-all duration-[1800ms] ease-[cubic-bezier(0.16,1,0.3,1)] will-change-[opacity,transform,filter] ${
           isLoading
-            ? 'opacity-0 pointer-events-none select-none'
-            : 'opacity-100 animate-[contentIn_1s_cubic-bezier(0.16,1,0.3,1)_forwards]'
+            ? 'opacity-0 translate-y-6 scale-[0.98] blur-[12px] pointer-events-none select-none'
+            : 'opacity-100 translate-y-0 scale-100 blur-0'
         }`}
         aria-hidden={isLoading}
       >
@@ -1038,16 +1107,32 @@ const App: React.FC = () => {
         <div className="fixed inset-0 pointer-events-none z-0 bg-[radial-gradient(circle_at_center,transparent_0%,rgba(0,0,0,0.6)_100%)]" />
 
         {/* Navbar */}
-        <nav className="sticky top-0 z-50 border-b border-zinc-800 bg-[#09090b]/80 backdrop-blur-xl supports-[backdrop-filter]:bg-[#09090b]/60">
-          <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
-            <div className="font-bold text-xl tracking-tight text-white flex items-center gap-3 cursor-pointer group" onClick={() => setPage('home')}>
-              <div className="w-9 h-9 bg-white rounded-xl flex items-center justify-center text-black font-black text-lg shadow-[0_0_15px_rgba(255,255,255,0.3)] transition-all group-hover:scale-110 group-hover:rotate-6 group-hover:bg-blue-400">
-                A
+        <nav className="sticky top-0 z-50 border-b border-zinc-800/50 bg-[#09090b]/90 backdrop-blur-xl supports-[backdrop-filter]:bg-[#09090b]/70 shadow-lg shadow-black/20">
+          <div className="max-w-7xl mx-auto px-6 h-24 flex items-center justify-between">
+            <div className="font-bold text-xl tracking-tight text-white flex items-center gap-4 cursor-pointer group" onClick={() => setPage('home')}>
+              <div className="relative">
+                <div className="w-11 h-11 bg-gradient-to-br from-white via-blue-50 to-blue-100 rounded-xl flex items-center justify-center text-black font-black text-xl shadow-[0_0_20px_rgba(255,255,255,0.4)] transition-all group-hover:scale-110 group-hover:rotate-6 group-hover:shadow-[0_0_30px_rgba(59,130,246,0.6)]">
+                  A
+                </div>
+                <div className="absolute -top-0.5 -right-0.5 w-3.5 h-3.5 bg-green-500 rounded-full border-2 border-[#09090b] animate-pulse shadow-[0_0_8px_rgba(34,197,94,0.6)]"></div>
               </div>
-              <span className="group-hover:text-zinc-100 transition-colors font-display tracking-wide">Abraham<span className="text-blue-500 group-hover:text-white">.</span></span>
+              <div className="flex flex-col">
+                <span className="group-hover:text-zinc-100 transition-colors font-display tracking-wide text-xl leading-tight">Abraham<span className="text-blue-500 group-hover:text-white">.</span></span>
+                <div className="flex items-center gap-3 text-xs text-zinc-500 font-mono">
+                  <span className="flex items-center gap-1.5">
+                    <div className="w-1.5 h-1.5 rounded-full bg-green-500"></div>
+                    Available
+                  </span>
+                  <span>•</span>
+                  <span className="flex items-center gap-1.5">
+                    <MapPin className="w-3 h-3" />
+                    Champaign, IL
+                  </span>
+                </div>
+              </div>
             </div>
 
-            <div className="hidden md:flex items-center gap-1">
+            <div className="hidden md:flex items-center gap-2">
               <NavItem id="home" label="Profile" icon={<User className="w-4 h-4"/>} active={page === 'home'} onClick={setPage} />
               <NavItem id="experience" label="Experience" icon={<Briefcase className="w-4 h-4"/>} active={page === 'experience'} onClick={setPage} />
               <NavItem id="projects" label="Projects" icon={<Code2 className="w-4 h-4"/>} active={page === 'projects'} onClick={setPage} />
@@ -1056,18 +1141,48 @@ const App: React.FC = () => {
               <NavItem id="contact" label="Contact" icon={<Mail className="w-4 h-4"/>} active={page === 'contact'} onClick={setPage} />
             </div>
 
-            <button 
-              onClick={() => setPage('neural')}
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-bold transition-all border tracking-wide group overflow-hidden relative ${
-                page === 'neural' 
-                  ? 'bg-blue-500 text-white border-blue-400 shadow-[0_0_20px_rgba(59,130,246,0.4)]' 
-                  : 'bg-zinc-900 text-zinc-400 border-zinc-800 hover:border-blue-500/50 hover:text-blue-400 hover:bg-zinc-800'
-              }`}
-            >
-              <div className={`absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full ${page !== 'neural' ? 'group-hover:animate-[shimmer_1s_infinite]' : ''}`} />
-              <Cpu className="w-3 h-3 group-hover:rotate-180 transition-transform duration-500" />
-              <span className="font-display">GESTURE LAB</span>
-            </button>
+            <div className="flex items-center gap-3">
+              <div className="hidden lg:flex items-center gap-3 text-zinc-500">
+                <a 
+                  href="https://github.com/Abraham77967" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="p-2 rounded-lg text-zinc-500 hover:text-purple-400 hover:bg-zinc-800/50 transition-all group"
+                  title="GitHub"
+                >
+                  <Github className="w-4 h-4 group-hover:scale-110 transition-transform" />
+                </a>
+                <a 
+                  href="https://www.linkedin.com/in/abraham-guo/" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="p-2 rounded-lg text-zinc-500 hover:text-blue-400 hover:bg-zinc-800/50 transition-all group"
+                  title="LinkedIn"
+                >
+                  <Linkedin className="w-4 h-4 group-hover:scale-110 transition-transform" />
+                </a>
+                <a 
+                  href="mailto:abrahamg7797@gmail.com" 
+                  className="p-2 rounded-lg text-zinc-500 hover:text-cyan-400 hover:bg-zinc-800/50 transition-all group"
+                  title="Email"
+                >
+                  <Mail className="w-4 h-4 group-hover:scale-110 transition-transform" />
+                </a>
+              </div>
+              
+              <button 
+                onClick={() => setPage('neural')}
+                className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold transition-all border tracking-wide group overflow-hidden relative ${
+                  page === 'neural' 
+                    ? 'bg-blue-500 text-white border-blue-400 shadow-[0_0_20px_rgba(59,130,246,0.4)]' 
+                    : 'bg-zinc-900 text-zinc-400 border-zinc-800 hover:border-blue-500/50 hover:text-blue-400 hover:bg-zinc-800'
+                }`}
+              >
+                <div className={`absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full ${page !== 'neural' ? 'group-hover:animate-[shimmer_1s_infinite]' : ''}`} />
+                <Cpu className="w-4 h-4 group-hover:rotate-180 transition-transform duration-500" />
+                <span className="font-display">GESTURE LAB</span>
+              </button>
+            </div>
           </div>
         </nav>
 
@@ -1081,7 +1196,7 @@ const App: React.FC = () => {
         </div>
 
         {/* Main Content */}
-        <main className="relative z-10 px-4 pb-32 md:pb-12 pt-8 min-h-[calc(100vh-64px)]">
+        <main className="relative z-10 px-4 pb-32 md:pb-12 pt-8 min-h-[calc(100vh-96px)]">
           {page === 'home' && <Home setPage={setPage} />}
           {page === 'experience' && <Experience />}
           {page === 'projects' && <Projects setPage={setPage} />}
